@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>স্পিন করুন এবং ৫০০ টাকা জিতে নিন!</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      padding: 20px;
+    }
+    h1 {
+      color: #d62828;
+    }
+    #wheel {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 6px solid #ccc;
+      margin: 20px auto;
+      background: conic-gradient(
+        #ff6b6b 0deg 90deg,
+        #feca57 90deg 180deg,
+        #48dbfb 180deg 270deg,
+        #1dd1a1 270deg 360deg
+      );
+    }
+    #spinBtn, #submitBtn, #okBtn {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #0984e3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    #spinBtn:hover, #submitBtn:hover, #okBtn:hover {
+      background-color: #74b9ff;
+    }
+    #formSection, #resultMessage {
+      display: none;
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      max-width: 250px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎉 স্পিন করুন এবং ৫০০ টাকা ফ্রি জিতে নিন!</h1>
+  <p>নিচের চাকা ঘুরান এবং আপনার ভাগ্য পরীক্ষা করুন।</p>
+
+  <div id="wheel"></div>
+  <button id="spinBtn">✅ স্পিন করুন</button>
+
+  <div id="formSection">
+    <h2>আপনার বিকাশ নম্বর দিন 👇</h2>
+    <form id="bikashForm">
+      <input type="text" id="bikashNumber" placeholder="বিকাশ নম্বর লিখুন" required><br>
+      <button type="submit" id="submitBtn">সাবমিট করুন</button>
+    </form>
+  </div>
+
+  <div id="resultMessage">
+    <p>✅ ধন্যবাদ! আপনার বোনাস ৭২ ঘণ্টার মধ্যে পাঠানো হবে।</p>
+    <!-- 🔻 এখানে OK বাটনে ক্লিক করলে অ্যাডস্টেরার ডিরেক্ট লিংকে যাবে -->
+    <button id="okBtn">OK</button>
+  </div>
+
+  <script>
+    // 🔁 স্পিন করার কাজ
+    document.getElementById('spinBtn').addEventListener('click', function () {
+      const wheel = document.getElementById('wheel');
+      let deg = Math.floor(Math.random() * 360) + 720; // ঘুরবে 2 বার
+      wheel.style.transition = 'transform 3s ease-out';
+      wheel.style.transform = 'rotate(' + deg + 'deg)';
+
+      // ✅ স্পিন শেষ হলে ফর্ম দেখাও
+      setTimeout(function () {
+        document.getElementById('formSection').style.display = 'block';
+      }, 3500);
+
+      // 🔻 চাইলে এখানে অ্যাডস্টেরার ইন্টারস্টিশিয়াল কোড বসাতে পারেন (স্পিন শেষে ফুল স্ক্রিন অ্যাড)
+      // উদাহরণ:
+      // setTimeout(function () {
+      //   /* Adsterra Interstitial Script Goes Here */
+      // }, 3000);
+    });
+
+    // 📩 ফর্ম সাবমিট করলে
+    document.getElementById('bikashForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const number = document.getElementById('bikashNumber').value;
+
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('resultMessage').style.display = 'block';
+
+      // 🔐 চাইলে এখানে নাম্বার Google Sheet / Firebase-এ পাঠাতে পারেন
+    });
+
+    // ✅ OK বাটনে ক্লিক করলে Adsterra লিংকে পাঠানো হবে
+    document.getElementById('okBtn').addEventListener('click', function () {
+      window.location.href = "https://your-adsterra-direct-link.com"; // 🔗 এখানে আপনার ডিরেক্ট লিংক বসান
+    });
+  </script>
+
+</body>
+</html>
