@@ -3,115 +3,153 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>স্পিন করুন এবং ৫০০ টাকা জিতে নিন!</title>
+  <title>স্পিন করে টাকা জিতুন</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      background: #f8f9fa;
-      padding: 20px;
-    }
-    h1 {
-      color: #d62828;
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
     }
     #wheel {
-      width: 280px;
-      height: 280px;
+      margin-top: 30px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #FFD700, #FFA500);
       border-radius: 50%;
-      border: 6px solid #ccc;
-      margin: 20px auto;
-      background: conic-gradient(
-        #ff6b6b 0deg 90deg,
-        #feca57 90deg 180deg,
-        #48dbfb 180deg 270deg,
-        #1dd1a1 270deg 360deg
-      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
-    #spinBtn, #submitBtn, #okBtn {
-      padding: 12px 25px;
-      font-size: 16px;
-      background-color: #0984e3;
+    #adPopup, #formPopup, #successPopup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .popup-content {
+      background: #fff;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 20px;
+      background: #28a745;
       color: white;
       border: none;
       border-radius: 5px;
-      margin-top: 15px;
       cursor: pointer;
     }
-    #spinBtn:hover, #submitBtn:hover, #okBtn:hover {
-      background-color: #74b9ff;
-    }
-    #formSection, #resultMessage {
-      display: none;
+    #recentList {
       margin-top: 20px;
+      width: 90%;
+      max-width: 500px;
     }
-    input[type="text"] {
-      padding: 10px;
-      width: 80%;
-      max-width: 250px;
-      margin-top: 10px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
       border: 1px solid #ccc;
-      border-radius: 5px;
+      padding: 8px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-  <h1>🎉 স্পিন করুন এবং ৫০০ টাকা ফ্রি জিতে নিন!</h1>
-  <p>নিচের চাকা ঘুরান এবং আপনার ভাগ্য পরীক্ষা করুন।</p>
+  <div id="wheel" onclick="spinWheel()">স্পিন করুন</div>
 
-  <div id="wheel"></div>
-  <button id="spinBtn">✅ স্পিন করুন</button>
-
-  <div id="formSection">
-    <h2>আপনার বিকাশ নম্বর দিন 👇</h2>
-    <form id="bikashForm">
-      <input type="text" id="bikashNumber" placeholder="বিকাশ নম্বর লিখুন" required><br>
-      <button type="submit" id="submitBtn">সাবমিট করুন</button>
-    </form>
+  <div id="adPopup">
+    <div class="popup-content">
+      <p>অ্যাড চলছে... ৫ সেকেন্ড অপেক্ষা করুন</p>
+    </div>
   </div>
 
-  <div id="resultMessage">
-    <p>✅ ধন্যবাদ! আপনার বোনাস ৭২ ঘণ্টার মধ্যে পাঠানো হবে।</p>
-    <!-- 🔻 এখানে OK বাটনে ক্লিক করলে অ্যাডস্টেরার ডিরেক্ট লিংকে যাবে -->
-    <button id="okBtn">OK</button>
+  <div id="formPopup">
+    <div class="popup-content">
+      <p>তালিকায় যোগ দিতে আপনার নাম ও বিকাশ নাম্বার দিন</p>
+      <input type="text" id="name" placeholder="আপনার নাম">
+      <input type="text" id="bkash" placeholder="বিকাশ নাম্বার">
+      <button onclick="submitForm()">সাবমিট</button>
+    </div>
+  </div>
+
+  <div id="successPopup">
+    <div class="popup-content">
+      <p>৭২ ঘণ্টার মধ্যে চেক করে পেমেন্ট করা হবে</p>
+      <button onclick="goToRedirect()">ওকে</button>
+    </div>
+  </div>
+
+  <div id="recentList">
+    <h3>সাম্প্রতিক অংশগ্রহণকারীরা</h3>
+    <table>
+      <thead><tr><th>নাম</th><th>নাম্বার</th></tr></thead>
+      <tbody id="userList"></tbody>
+    </table>
+    <h4>সিরিয়াল নম্বর (১-১০)</h4>
+    <ol id="serialList"></ol>
   </div>
 
   <script>
-    // 🔁 স্পিন করার কাজ
-    document.getElementById('spinBtn').addEventListener('click', function () {
-      const wheel = document.getElementById('wheel');
-      let deg = Math.floor(Math.random() * 360) + 720; // ঘুরবে 2 বার
-      wheel.style.transition = 'transform 3s ease-out';
-      wheel.style.transform = 'rotate(' + deg + 'deg)';
+    function spinWheel() {
+      document.getElementById('adPopup').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('adPopup').style.display = 'none';
+        document.getElementById('formPopup').style.display = 'flex';
+      }, 5000); // ৫ সেকেন্ড
+    }
 
-      // ✅ স্পিন শেষ হলে ফর্ম দেখাও
-      setTimeout(function () {
-        document.getElementById('formSection').style.display = 'block';
-      }, 3500);
+    function submitForm() {
+      const name = document.getElementById('name').value.trim();
+      const bkash = document.getElementById('bkash').value.trim();
+      if (name && bkash.length >= 11) {
+        addToList(name, bkash);
+        document.getElementById('formPopup').style.display = 'none';
+        document.getElementById('successPopup').style.display = 'flex';
+      } else {
+        alert('সঠিক নাম ও বিকাশ নাম্বার দিন');
+      }
+    }
 
-      // 🔻 চাইলে এখানে অ্যাডস্টেরার ইন্টারস্টিশিয়াল কোড বসাতে পারেন (স্পিন শেষে ফুল স্ক্রিন অ্যাড)
-      // উদাহরণ:
-      // setTimeout(function () {
-      //   /* Adsterra Interstitial Script Goes Here */
-      // }, 3000);
-    });
+    function addToList(name, number) {
+      const userList = document.getElementById('userList');
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${name}</td><td>****${number.slice(-4)}</td>`;
+      userList.prepend(row);
+      if (userList.rows.length > 8) userList.deleteRow(-1);
 
-    // 📩 ফর্ম সাবমিট করলে
-    document.getElementById('bikashForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const number = document.getElementById('bikashNumber').value;
+      const serialList = document.getElementById('serialList');
+      const item = document.createElement('li');
+      item.textContent = number;
+      serialList.appendChild(item);
+      if (serialList.children.length > 10) serialList.removeChild(serialList.firstChild);
+    }
 
-      document.getElementById('formSection').style.display = 'none';
-      document.getElementById('resultMessage').style.display = 'block';
-
-      // 🔐 চাইলে এখানে নাম্বার Google Sheet / Firebase-এ পাঠাতে পারেন
-    });
-
-    // ✅ OK বাটনে ক্লিক করলে Adsterra লিংকে পাঠানো হবে
-    document.getElementById('okBtn').addEventListener('click', function () {
-      window.location.href = "https://your-adsterra-direct-link.com"; // 🔗 এখানে আপনার ডিরেক্ট লিংক বসান
-    });
+    function goToRedirect() {
+      document.getElementById('successPopup').style.display = 'none';
+      window.location.href = 'https://www.profitableratecpm.com/g5za6ey4sa?key=1998f472c59bc55a37015a5445ced87c';
+    }
   </script>
-
 </body>
 </html>
