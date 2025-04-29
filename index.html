@@ -2,31 +2,57 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>স্পিন করে টাকা জিতুন</title>
+  <title>Spin Wheel</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f0f8ff;
-      margin: 0;
-      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: start;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
-    #wheel {
-      margin-top: 30px;
+    .container {
+      position: relative;
+    }
+    .wheel {
       width: 300px;
       height: 300px;
-      background: radial-gradient(circle, #FFD700, #FFA500);
       border-radius: 50%;
+      border: 10px solid #333;
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       justify-content: center;
-      cursor: pointer;
+      align-items: center;
+      transition: 5s ease-out;
     }
-    #adPopup, #formPopup, #successPopup {
+    .number {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      background: var(--clr);
+      transform: rotate(calc(45deg * var(--i))) translateY(-100%);
+      transform-origin: bottom center;
+      text-align: center;
+      line-height: 2;
+      color: #fff;
+      font-size: 20px;
+    }
+    .spinBtn {
+      margin-top: 20px;
+      padding: 10px 30px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    /* Popup styles */
+    #formPopup, #successPopup {
       position: fixed;
       top: 0;
       left: 0;
@@ -38,6 +64,7 @@
       justify-content: center;
       z-index: 1000;
     }
+
     .popup-content {
       background: #fff;
       padding: 20px;
@@ -46,11 +73,13 @@
       width: 90%;
       max-width: 400px;
     }
+
     input {
       width: 90%;
       padding: 10px;
       margin: 10px 0;
     }
+
     button {
       padding: 10px 20px;
       background: #28a745;
@@ -59,15 +88,18 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     #recentList {
       margin-top: 20px;
       width: 90%;
       max-width: 500px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
     }
+
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
@@ -77,19 +109,25 @@
 </head>
 <body>
 
-  <div id="wheel" onclick="spinWheel()">স্পিন করুন</div>
-
-  <div id="adPopup">
-    <div class="popup-content">
-      <p>অ্যাড চলছে... ৫ সেকেন্ড অপেক্ষা করুন</p>
+  <div class="container">
+    <div class="wheel" id="wheel">
+      <div class="number" style="--i:1;--clr:#db7093;"><span>১০০</span></div>
+      <div class="number" style="--i:2;--clr:#20b2aa;"><span>৫</span></div>
+      <div class="number" style="--i:3;--clr:#daa520;"><span>২০</span></div>
+      <div class="number" style="--i:4;--clr:#ff340f;"><span>0</span></div>
+      <div class="number" style="--i:5;--clr:#4169e1;"><span>৫০০</span></div>
+      <div class="number" style="--i:6;--clr:#3cb371;"><span>১০</span></div>
+      <div class="number" style="--i:7;--clr:#d63e92;"><span>০</span></div>
+      <div class="number" style="--i:8;--clr:#ff7f50;"><span>১৫</span></div>
     </div>
+    <div class="spinBtn" id="spinBtn">Spin</div>
   </div>
 
   <div id="formPopup">
     <div class="popup-content">
-      <p>তালিকায় যোগ দিতে আপনার নাম ও বিকাশ নাম্বার দিন</p>
+      <p>আপনার নাম ও বিকাশ/নগদ নাম্বার দিন</p>
       <input type="text" id="name" placeholder="আপনার নাম">
-      <input type="text" id="bkash" placeholder="বিকাশ নাম্বার">
+      <input type="text" id="bkash" placeholder="বিকাশ/নগদ নাম্বার">
       <button onclick="submitForm()">সাবমিট</button>
     </div>
   </div>
@@ -107,24 +145,30 @@
       <thead><tr><th>নাম</th><th>নাম্বার</th></tr></thead>
       <tbody id="userList"></tbody>
     </table>
-    <h4>সিরিয়াল নম্বর (১-১০)</h4>
-    <ol id="serialList"></ol>
   </div>
 
   <script>
-    function spinWheel() {
-      document.getElementById('adPopup').style.display = 'flex';
+    let wheel = document.getElementById('wheel');
+    let spinBtn = document.getElementById('spinBtn');
+    let value = Math.ceil(Math.random() * 3600);
+
+    spinBtn.onclick = function(){
+      wheel.style.transform = "rotate(" + value + "deg)";
+      value += Math.ceil(Math.random() * 3600);
       setTimeout(() => {
-        document.getElementById('adPopup').style.display = 'none';
         document.getElementById('formPopup').style.display = 'flex';
-      }, 5000); // ৫ সেকেন্ড
+      }, 5000);
     }
 
     function submitForm() {
       const name = document.getElementById('name').value.trim();
       const bkash = document.getElementById('bkash').value.trim();
       if (name && bkash.length >= 11) {
-        addToList(name, bkash);
+        const userList = document.getElementById('userList');
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${name}</td><td>****${bkash.slice(-4)}</td>`;
+        userList.prepend(row);
+        if (userList.rows.length > 8) userList.deleteRow(-1);
         document.getElementById('formPopup').style.display = 'none';
         document.getElementById('successPopup').style.display = 'flex';
       } else {
@@ -132,26 +176,13 @@
       }
     }
 
-    function addToList(name, number) {
-      const userList = document.getElementById('userList');
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${name}</td><td>****${number.slice(-4)}</td>`;
-      userList.prepend(row);
-      if (userList.rows.length > 8) userList.deleteRow(-1);
-
-      const serialList = document.getElementById('serialList');
-      const item = document.createElement('li');
-      item.textContent = number;
-      serialList.appendChild(item);
-      if (serialList.children.length > 10) serialList.removeChild(serialList.firstChild);
-    }
-
     function goToRedirect() {
       document.getElementById('successPopup').style.display = 'none';
-      window.location.href = 'https://www.profitableratecpm.com/g5za6ey4sa?key=1998f472c59bc55a37015a5445ced87c';
+      window.location.href = 'https://www.profitableratecpm.com/g5za6ey4sa?key=1998f472c59bc55a37015a5445ced87c'; // এখানে তোমার অ্যাডস্টের্রা direct লিংক বসাও
     }
   </script>
 
-  <script type='text/javascript' src='//pl26513661.profitableratecpm.com/8a/77/59/8a7759607f3e7edf15518a6836e44965.js'></script>
 </body>
 </html>
+
+    
