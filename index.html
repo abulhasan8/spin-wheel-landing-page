@@ -220,6 +220,48 @@
     }
   </script>
 
+
+  <script>
+  function submitForm() {
+    const name = document.getElementById('name').value.trim();
+    const bkash = document.getElementById('bkash').value.trim();
+    if (name && bkash.length >= 11) {
+      // Only show masked bkash in UI
+      const maskedBkash = bkash.slice(-6).padStart(bkash.length, '*');
+      addToList(name, maskedBkash);
+
+      // Send full data to Google Sheet
+      fetch('https://script.google.com/macros/s/AKfycbyIC0nUvPk3WWP_lLZSG_jHdJHhOHt9ny8Lfu0-GBONNkYD6MhYnSemGVLIGLwP3bL9/exec', {
+        method: 'POST',
+        body: JSON.stringify({ name, bkash }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      document.getElementById('formPopup').style.display = 'none';
+      document.getElementById('successPopup').style.display = 'flex';
+    } else {
+      alert('সঠিক নাম ও বিকাশ নাম্বার দিন');
+    }
+  }
+
+  function addToList(name, maskedBkash) {
+    const userList = document.getElementById('userList');
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${name}</td><td>${maskedBkash}</td>`;
+    userList.prepend(row);
+    if (userList.rows.length > 8) userList.deleteRow(-1);
+
+    const serialList = document.getElementById('serialList');
+    const item = document.createElement('li');
+    item.textContent = maskedBkash;
+    serialList.appendChild(item);
+    if (serialList.children.length > 10) serialList.removeChild(serialList.firstChild);
+  }
+</script>
+
+
+  
+
 </body>
 </html>
 
