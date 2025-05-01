@@ -1,128 +1,116 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Spin Wheel Game</title>
 
-  <!-- Facebook Pixel Code -->
-  <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1174204890851531');
-  fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1174204890851531&ev=PageView&noscript=1"
-  /></noscript>
-  <!-- End Facebook Pixel Code -->
-
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: sans-serif;
+    }
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      background: #333;
+      background: #222;
       color: #fff;
     }
     .container {
       position: relative;
-      width: 400px;
-      height: 400px;
+      width: 360px;
+      height: 360px;
     }
     .spinBtn {
       position: absolute;
       top: 50%; left: 50%;
       width: 80px; height: 80px;
       margin: -40px 0 0 -40px;
-      background: #fff;
-      color: #333;
+      background: #ffeb3b;
+      color: #222;
       font-weight: bold;
-      cursor: pointer;
-      border: 4px solid rgba(0,0,0,0.75);
+      border: 4px solid #fbc02d;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; user-select: none;
       text-transform: uppercase;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .spinBtn:hover {
+      background: #fdd835;
     }
     .wheel {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       border-radius: 50%;
-      background: #333;
       overflow: hidden;
-      box-shadow: 0 0 0 5px #333, 0 0 0 15px #fff, 0 0 0 18px #111;
+      box-shadow: 0 0 0 8px #333, 0 0 0 12px #fff;
       transition: transform 5s ease-out;
     }
-    .wheel .number {
+    .wheel .segment {
       position: absolute;
       width: 50%;
       height: 50%;
-      background: var(--clr);
       transform-origin: bottom center;
-      transform: rotate(calc(45deg * (var(--i) - 1))) translateY(-100%);
-      clip-path: polygon(0 0, 56% 0, 100% 100%, 0 56%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      clip-path: polygon(50% 50%, 100% 0, 100% 100%);
+      display: flex; align-items: center; justify-content: center;
     }
-    .wheel .number span {
-      transform: rotate(45deg);
-      font-size: 2em;
+    .wheel .segment span {
+      transform: rotate(calc(360deg / 10)); /* half segment */
+      font-size: 1.5em;
       font-weight: bold;
       color: #fff;
-      text-shadow: 3px 5px 2px rgba(0,0,0,0.15);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
-    .wheel .number span::after {
-      content: '$';
-      font-size: 0.75em;
-      font-weight: 500;
-      position: absolute;
-      top: -10px;
+    /* 5 segments: each 72°, colors alternating */
+    .wheel .segment:nth-child(1) { --i:0; --clr:#e74c3c; }
+    .wheel .segment:nth-child(2) { --i:1; --clr:#3498db; }
+    .wheel .segment:nth-child(3) { --i:2; --clr:#f1c40f; }
+    .wheel .segment:nth-child(4) { --i:3; --clr:#2ecc71; }
+    .wheel .segment:nth-child(5) { --i:4; --clr:#9b59b6; }
+
+    .wheel .segment {
+      background: var(--clr);
+      transform: rotate(calc(72deg * var(--i))) translateY(-50%);
     }
+
     #resultPopup {
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.85);
       display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
+      align-items: center; justify-content: center;
+      z-index: 1000;
     }
     .popup-content {
       background: #fff;
+      color: #222;
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 8px;
       text-align: center;
-      color: #000;
+      max-width: 280px;
       width: 90%;
-      max-width: 320px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     .popup-content p {
-      font-size: 18px;
-      margin-bottom: 20px;
+      font-size: 1.2em;
+      margin-bottom: 16px;
     }
     .popup-content button {
       padding: 10px 20px;
-      background: #28a745;
+      background: #3498db;
       color: #fff;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 1em;
+    }
+    .popup-content button:hover {
+      background: #2980b9;
     }
   </style>
 </head>
@@ -130,19 +118,15 @@
 
   <div class="container">
     <div class="wheel" id="wheel">
-      <div class="number" style="--i:1; --clr:#db7093;"><span>100</span></div>
-      <div class="number" style="--i:2; --clr:#20b2aa;"><span>0</span></div>
-      <div class="number" style="--i:3; --clr:#daa520;"><span>50</span></div>
-      <div class="number" style="--i:4; --clr:#ff340f;"><span>0</span></div>
-      <div class="number" style="--i:5; --clr:#4169e1;"><span>200</span></div>
-      <div class="number" style="--i:6; --clr:#3cb371;"><span>10</span></div>
-      <div class="number" style="--i:7; --clr:#d63e92;"><span>0</span></div>
-      <div class="number" style="--i:8; --clr:#ff7f50;"><span>20</span></div>
+      <div class="segment"><span>100</span></div>
+      <div class="segment"><span>0</span></div>
+      <div class="segment"><span>50</span></div>
+      <div class="segment"><span>200</span></div>
+      <div class="segment"><span>10</span></div>
     </div>
     <div class="spinBtn" id="spinBtn">Spin</div>
   </div>
 
-  <!-- Result Popup -->
   <div id="resultPopup">
     <div class="popup-content">
       <p id="resultText">You won $0!</p>
@@ -155,18 +139,20 @@
     const spinBtn = document.getElementById('spinBtn');
     const resultPopup = document.getElementById('resultPopup');
     const resultText = document.getElementById('resultText');
-    let angle = 0;
+    let currentAngle = 0;
+
+    const prizes = [100, 0, 50, 200, 10];
 
     spinBtn.onclick = () => {
       spinBtn.style.pointerEvents = 'none';
-      const segmentAngle = 360 / 8;
-      const randomIndex = Math.floor(Math.random() * 8);
-      const prizes = [100, 0, 50, 0, 200, 10, 0, 20];
-      const prize = prizes[randomIndex];
-      // Spin 5 full rotations plus land on the chosen segment
-      const newSpin = 360 * 5 + randomIndex * segmentAngle + segmentAngle / 2;
-      angle += newSpin;
-      wheel.style.transform = `rotate(${angle}deg)`;
+      const segmentCount = prizes.length;
+      const segmentAngle = 360 / segmentCount;
+      const idx = Math.floor(Math.random() * segmentCount);
+      const prize = prizes[idx];
+      // 5 full spins + center of chosen segment
+      const spinAngle = 360 * 5 + idx * segmentAngle + segmentAngle / 2;
+      currentAngle += spinAngle;
+      wheel.style.transform = `rotate(${currentAngle}deg)`;
 
       setTimeout(() => {
         resultText.textContent = `You won $${prize}!`;
@@ -182,4 +168,3 @@
 
 </body>
 </html>
-```
