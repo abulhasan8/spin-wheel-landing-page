@@ -1,169 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <title>Spin Wheel Game</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>স্পিন করুন এবং ৫০০ টাকা জিতে নিন!</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: sans-serif;
-    }
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: #222;
-      color: #fff;
-    }
-    .container {
-      position: relative;
-      width: 360px;
-      height: 360px;
-    }
-    .spinBtn {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 80px; height: 80px;
-      margin: -40px 0 0 -40px;
-      background: #ffeb3b;
-      color: #222;
-      font-weight: bold;
-      border: 4px solid #fbc02d;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; user-select: none;
-      text-transform: uppercase;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-    .spinBtn:hover {
-      background: #fdd835;
-    }
-    .wheel {
-      width: 100%; height: 100%;
-      border-radius: 50%;
-      overflow: hidden;
-      box-shadow: 0 0 0 8px #333, 0 0 0 12px #fff;
-      transition: transform 5s ease-out;
-    }
-    .wheel .segment {
-      position: absolute;
-      width: 50%;
-      height: 50%;
-      transform-origin: bottom center;
-      clip-path: polygon(50% 50%, 100% 0, 100% 100%);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .wheel .segment span {
-      transform: rotate(calc(360deg / 10)); /* half segment */
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-    /* 5 segments: each 72°, colors alternating */
-    .wheel .segment:nth-child(1) { --i:0; --clr:#e74c3c; }
-    .wheel .segment:nth-child(2) { --i:1; --clr:#3498db; }
-    .wheel .segment:nth-child(3) { --i:2; --clr:#f1c40f; }
-    .wheel .segment:nth-child(4) { --i:3; --clr:#2ecc71; }
-    .wheel .segment:nth-child(5) { --i:4; --clr:#9b59b6; }
-
-    .wheel .segment {
-      background: var(--clr);
-      transform: rotate(calc(72deg * var(--i))) translateY(-50%);
-    }
-
-    #resultPopup {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center; justify-content: center;
-      z-index: 1000;
-    }
-    .popup-content {
-      background: #fff;
-      color: #222;
-      padding: 20px;
-      border-radius: 8px;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      max-width: 280px;
-      width: 90%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      background: #f8f9fa;
+      padding: 20px;
     }
-    .popup-content p {
-      font-size: 1.2em;
-      margin-bottom: 16px;
+    h1 {
+      color: #d62828;
     }
-    .popup-content button {
-      padding: 10px 20px;
-      background: #3498db;
-      color: #fff;
+    #wheel {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 6px solid #ccc;
+      margin: 20px auto;
+      background: conic-gradient(
+        #ff6b6b 0deg 90deg,
+        #feca57 90deg 180deg,
+        #48dbfb 180deg 270deg,
+        #1dd1a1 270deg 360deg
+      );
+    }
+    #spinBtn, #submitBtn, #okBtn {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #0984e3;
+      color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
+      margin-top: 15px;
       cursor: pointer;
-      font-size: 1em;
     }
-    .popup-content button:hover {
-      background: #2980b9;
+    #spinBtn:hover, #submitBtn:hover, #okBtn:hover {
+      background-color: #74b9ff;
+    }
+    #formSection, #resultMessage {
+      display: none;
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      max-width: 250px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="wheel" id="wheel">
-      <div class="segment"><span>100</span></div>
-      <div class="segment"><span>0</span></div>
-      <div class="segment"><span>50</span></div>
-      <div class="segment"><span>200</span></div>
-      <div class="segment"><span>10</span></div>
-    </div>
-    <div class="spinBtn" id="spinBtn">Spin</div>
+  <h1>🎉 স্পিন করুন এবং ৫০০ টাকা ফ্রি জিতে নিন!</h1>
+  <p>নিচের চাকা ঘুরান এবং আপনার ভাগ্য পরীক্ষা করুন।</p>
+
+  <div id="wheel"></div>
+  <button id="spinBtn">✅ স্পিন করুন</button>
+
+  <div id="formSection">
+    <h2>আপনার বিকাশ নম্বর দিন 👇</h2>
+    <form id="bikashForm">
+      <input type="text" id="bikashNumber" placeholder="বিকাশ নম্বর লিখুন" required><br>
+      <button type="submit" id="submitBtn">সাবমিট করুন</button>
+    </form>
   </div>
 
-  <div id="resultPopup">
-    <div class="popup-content">
-      <p id="resultText">You won $0!</p>
-      <button onclick="goToRedirect()">OK</button>
-    </div>
+  <div id="resultMessage">
+    <p>✅ ধন্যবাদ! আপনার বোনাস ৭২ ঘণ্টার মধ্যে পাঠানো হবে।</p>
+    <!-- 🔻 এখানে OK বাটনে ক্লিক করলে অ্যাডস্টেরার ডিরেক্ট লিংকে যাবে -->
+    <button id="okBtn">OK</button>
   </div>
 
   <script>
-    const wheel = document.getElementById('wheel');
-    const spinBtn = document.getElementById('spinBtn');
-    const resultPopup = document.getElementById('resultPopup');
-    const resultText = document.getElementById('resultText');
-    let currentAngle = 0;
+    // 🔁 স্পিন করার কাজ
+    document.getElementById('spinBtn').addEventListener('click', function () {
+      const wheel = document.getElementById('wheel');
+      let deg = Math.floor(Math.random() * 360) + 720; // ঘুরবে 2 বার
+      wheel.style.transition = 'transform 3s ease-out';
+      wheel.style.transform = 'rotate(' + deg + 'deg)';
 
-    const prizes = [100, 0, 50, 200, 10];
+      // ✅ স্পিন শেষ হলে ফর্ম দেখাও
+      setTimeout(function () {
+        document.getElementById('formSection').style.display = 'block';
+      }, 3500);
 
-    spinBtn.onclick = () => {
-      spinBtn.style.pointerEvents = 'none';
-      const segmentCount = prizes.length;
-      const segmentAngle = 360 / segmentCount;
-      const idx = Math.floor(Math.random() * segmentCount);
-      const prize = prizes[idx];
-      // 5 full spins + center of chosen segment
-      const spinAngle = 360 * 5 + idx * segmentAngle + segmentAngle / 2;
-      currentAngle += spinAngle;
-      wheel.style.transform = `rotate(${currentAngle}deg)`;
+      // 🔻 চাইলে এখানে অ্যাডস্টেরার ইন্টারস্টিশিয়াল কোড বসাতে পারেন (স্পিন শেষে ফুল স্ক্রিন অ্যাড)
+      // উদাহরণ:
+      // setTimeout(function () {
+      //   /* Adsterra Interstitial Script Goes Here */
+      // }, 3000);
+    });
 
-      setTimeout(() => {
-        resultText.textContent = `You won $${prize}!`;
-        resultPopup.style.display = 'flex';
-        spinBtn.style.pointerEvents = 'auto';
-      }, 5000);
-    };
+    // 📩 ফর্ম সাবমিট করলে
+    document.getElementById('bikashForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const number = document.getElementById('bikashNumber').value;
 
-    function goToRedirect() {
-      window.location.href = 'https://bsirdw.click/c5bf01d52d02490faedb/ddeaadf32d/?placementName=default';
-    }
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('resultMessage').style.display = 'block';
+
+      // 🔐 চাইলে এখানে নাম্বার Google Sheet / Firebase-এ পাঠাতে পারেন
+    });
+
+    // ✅ OK বাটনে ক্লিক করলে Adsterra লিংকে পাঠানো হবে
+    document.getElementById('okBtn').addEventListener('click', function () {
+      window.location.href = "https://your-adsterra-direct-link.com"; // 🔗 এখানে আপনার ডিরেক্ট লিংক বসান
+    });
   </script>
 
 </body>
