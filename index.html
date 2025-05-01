@@ -1,117 +1,202 @@
+```html
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>স্পিন করুন এবং ৫০০ টাকা জিতে নিন!</title>
+  <title>Spin Wheel | Royal 420 KE</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: sans-serif;
+    }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      background: #f8f9fa;
-      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #333;
     }
-    h1 {
-      color: #d62828;
+    .container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    #wheel {
-      width: 280px;
-      height: 280px;
+    .spinBtn {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: #fff;
       border-radius: 50%;
-      border: 6px solid #ccc;
-      margin: 20px auto;
-      background: conic-gradient(
-        #ff6b6b 0deg 90deg,
-        #feca57 90deg 180deg,
-        #48dbfb 180deg 270deg,
-        #1dd1a1 270deg 360deg
-      );
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      color: #333;
+      border: 4px solid rgba(0,0,0,0.75);
+      cursor: pointer;
+      user-select: none;
     }
-    #spinBtn, #submitBtn, #okBtn {
-      padding: 12px 25px;
-      font-size: 16px;
-      background-color: #0984e3;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin-top: 15px;
+    .spinBtn::before {
+      content: '';
+      position: absolute;
+      top: -28px;
+      width: 20px;
+      height: 30px;
+      background: #fff;
+      clip-path: polygon(50% 0,15% 100%,85% 100%);
+    }
+    .wheel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #333;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 5px #333,
+        0 0 0 15px #fff,
+        0 0 0 18px #111;
+      transition: transform 5s ease-in-out;
+    }
+    .wheel .number {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      background: var(--clr);
+      transform-origin: bottom right;
+      transform: rotate(calc(45deg * var(--i)));
+      clip-path: polygon(0 0,56% 0,100% 100%,0 56%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
       cursor: pointer;
     }
-    #spinBtn:hover, #submitBtn:hover, #okBtn:hover {
-      background-color: #74b9ff;
+    .wheel .number span {
+      position: relative;
+      transform: rotate(45deg);
+      font-size: 2em;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 3px 5px 2px rgba(0,0,0,0.15);
     }
-    #formSection, #resultMessage {
+    .wheel .number span::after {
+      content: '$';
+      position: absolute;
+      font-size: 0.75em;
+      font-weight: 500;
+    }
+    /* Popup */
+    #resultPopup, #socialBar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      border-radius: 8px;
       display: none;
-      margin-top: 20px;
+      z-index: 1000;
     }
-    input[type="text"] {
-      padding: 10px;
-      width: 80%;
-      max-width: 250px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
+    #socialBar {
+      bottom: 20px;
+      width: auto;
+      display: flex;
+      gap: 10px;
+    }
+    #socialBar a {
+      color: #fff;
+      font-size: 24px;
+      text-decoration: none;
+    }
+    #resultPopup {
+      top: 50%;
+      width: 90%;
+      max-width: 300px;
+      transform: translate(-50%, -50%);
+    }
+    #resultPopup p {
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+    #resultPopup button {
+      padding: 10px 20px;
+      background: #28a745;
+      color: #fff;
+      border: none;
       border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
     }
   </style>
 </head>
 <body>
 
-  <h1>🎉 স্পিন করুন এবং ৫০০ টাকা ফ্রি জিতে নিন!</h1>
-  <p>নিচের চাকা ঘুরান এবং আপনার ভাগ্য পরীক্ষা করুন।</p>
-
-  <div id="wheel"></div>
-  <button id="spinBtn">✅ স্পিন করুন</button>
-
-  <div id="formSection">
-    <h2>আপনার বিকাশ নম্বর দিন 👇</h2>
-    <form id="bikashForm">
-      <input type="text" id="bikashNumber" placeholder="বিকাশ নম্বর লিখুন" required><br>
-      <button type="submit" id="submitBtn">সাবমিট করুন</button>
-    </form>
+  <div class="container">
+    <div class="spinBtn">Spin</div>
+    <div class="wheel">
+      <div class="number" style="--i:1;--clr:#db7093;"><span>100</span></div>
+      <div class="number" style="--i:2;--clr:#20b2aa;"><span>1</span></div>
+      <div class="number" style="--i:3;--clr:#daa520;"><span>50</span></div>
+      <div class="number" style="--i:4;--clr:#ff340f;"><span>0</span></div>
+      <div class="number" style="--i:5;--clr:#4169e1;"><span>1000</span></div>
+      <div class="number" style="--i:6;--clr:#3cb371;"><span>10</span></div>
+      <div class="number" style="--i:7;--clr:#d63e92;"><span>5</span></div>
+      <div class="number" style="--i:8;--clr:#ff7f50;"><span>20</span></div>
+    </div>
   </div>
 
-  <div id="resultMessage">
-    <p>✅ ধন্যবাদ! আপনার বোনাস ৭২ ঘণ্টার মধ্যে পাঠানো হবে।</p>
-    <!-- 🔻 এখানে OK বাটনে ক্লিক করলে অ্যাডস্টেরার ডিরেক্ট লিংকে যাবে -->
-    <button id="okBtn">OK</button>
+  <!-- Social bar ad -->
+  <div id="socialBar">
+    <a href="#"><img src="fb-icon.png" width="32" alt="Facebook"></a>
+    <a href="#"><img src="tw-icon.png" width="32" alt="Twitter"></a>
+    <a href="#"><img src="ig-icon.png" width="32" alt="Instagram"></a>
+  </div>
+
+  <!-- Result Popup -->
+  <div id="resultPopup">
+    <p id="resultText">You won $0!</p>
+    <button onclick="goToRedirect()">OK</button>
   </div>
 
   <script>
-    // 🔁 স্পিন করার কাজ
-    document.getElementById('spinBtn').addEventListener('click', function () {
-      const wheel = document.getElementById('wheel');
-      let deg = Math.floor(Math.random() * 360) + 720; // ঘুরবে 2 বার
-      wheel.style.transition = 'transform 3s ease-out';
-      wheel.style.transform = 'rotate(' + deg + 'deg)';
+    const wheel = document.querySelector('.wheel');
+    const spinBtn = document.querySelector('.spinBtn');
+    const socialBar = document.getElementById('socialBar');
+    const resultPopup = document.getElementById('resultPopup');
+    const resultText = document.getElementById('resultText');
+    let value = Math.ceil(Math.random() * 3600);
 
-      // ✅ স্পিন শেষ হলে ফর্ম দেখাও
-      setTimeout(function () {
-        document.getElementById('formSection').style.display = 'block';
-      }, 3500);
+    spinBtn.onclick = function() {
+      wheel.style.transform = "rotate(" + value + "deg)";
+      value += Math.ceil(Math.random() * 3600);
 
-      // 🔻 চাইলে এখানে অ্যাডস্টেরার ইন্টারস্টিশিয়াল কোড বসাতে পারেন (স্পিন শেষে ফুল স্ক্রিন অ্যাড)
-      // উদাহরণ:
-      // setTimeout(function () {
-      //   /* Adsterra Interstitial Script Goes Here */
-      // }, 3000);
-    });
+      // after spin ends
+      setTimeout(() => {
+        // show social bar ad
+        socialBar.style.display = 'flex';
+        // then show result popup
+        resultText.textContent = `You won $${Math.floor(Math.random()*8+1)*10}!`;
+        resultPopup.style.display = 'block';
+      }, 5000);
+    };
 
-    // 📩 ফর্ম সাবমিট করলে
-    document.getElementById('bikashForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const number = document.getElementById('bikashNumber').value;
-
-      document.getElementById('formSection').style.display = 'none';
-      document.getElementById('resultMessage').style.display = 'block';
-
-      // 🔐 চাইলে এখানে নাম্বার Google Sheet / Firebase-এ পাঠাতে পারেন
-    });
-
-    // ✅ OK বাটনে ক্লিক করলে Adsterra লিংকে পাঠানো হবে
-    document.getElementById('okBtn').addEventListener('click', function () {
-      window.location.href = "https://your-adsterra-direct-link.com"; // 🔗 এখানে আপনার ডিরেক্ট লিংক বসান
-    });
+    function goToRedirect() {
+      window.location.href = 'https://your-direct-link.com';
+    }
   </script>
 
 </body>
 </html>
+```
